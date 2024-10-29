@@ -6,19 +6,20 @@ func keyExpansion(key []byte) [][]byte {
 		nr = 10 // Número de rodadas (10 para AES-128)
 	)
 
-	//var roundKeys [11][16]byte
-	roundKeys := make([]byte, 11)
-	for i := 0; i < 11; i++ {
+	roundKeys := make([][]byte, nr+1)
+	for i := range roundKeys {
 		roundKeys[i] = make([]byte, 16)
 	}
-	copy(roundKeys[0][:], key) // Chave inicial é a primeira chave de rodada
 
+	// A chave inicial é a primeira chave de rodada
+	copy(roundKeys[0], key)
 	for i := 1; i <= nr; i++ {
 		// Últimos 4 bytes da rodada anterior
 		tmp := roundKeys[i-1][12:16]
 
 		// RotWord, SubWord e XOR com rcon
 		tmp = append(tmp[1:], tmp[0]) // RotWord
+
 		// SubWord
 		tmp[0] = sbox[tmp[0]]
 		tmp[1] = sbox[tmp[1]]
@@ -29,7 +30,6 @@ func keyExpansion(key []byte) [][]byte {
 
 		// Gera os 16 bytes da chave de rodada
 		for j := 0; j < 16; j++ {
-			// XOR com 4 bytes da rodada anterior
 			if j < 4 {
 				roundKeys[i][j] = roundKeys[i-1][j] ^ tmp[j]
 			} else {

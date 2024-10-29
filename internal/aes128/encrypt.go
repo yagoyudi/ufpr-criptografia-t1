@@ -39,9 +39,9 @@ func mixColumns(state []byte) {
 	}
 }
 
-func (aes *AES) EncryptBlock(input []byte) []byte {
+func (aes *AES) EncryptBlock(block []byte) []byte {
 	state := make([]byte, 16)
-	copy(state, input)
+	copy(state, block)
 
 	addRoundKey(state, aes.expandedKey[0])
 
@@ -57,4 +57,30 @@ func (aes *AES) EncryptBlock(input []byte) []byte {
 	addRoundKey(state, aes.expandedKey[10])
 
 	return state
+}
+
+func (aes *AES) Encrypt(plaintext []byte) ([]byte, error) {
+	numBlocks := (len(plaintext) + blockSize - 1) / blockSize
+	ciphertext := make([]byte, numBlocks*blockSize)
+
+	for i := 0; i < numBlocks; i++ {
+		block := make([]byte, blockSize)
+
+		// Copia o próximo bloco do plaintext, preenchendo se necessário
+		start := i * blockSize
+		end := start + blockSize
+		if end > len(plaintext) {
+			// Preenche com bytes de padding (ex: PKCS#7)
+			copy(block, plaintext[start:])
+			for j := len(plaintext) % blockSize; j < blockSize; j++ {
+				block[j] = byte(blockSize - len(plaintext)%blockSize)
+			}
+		} else {
+			copy(block, plaintext[start:end])
+		}
+		encryptedBlock := aes.EncryptBlock(block)
+		copy(ciphertext[i*blockSize:], encryptedBlock)
+	}
+
+	return ciphertext, nil
 }

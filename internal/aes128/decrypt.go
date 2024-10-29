@@ -42,9 +42,9 @@ func invMixColumns(state []byte) {
 }
 
 // decryptBlock decifra um bloco de 16 bytes
-func (aes *AES) DecryptBlock(input []byte) []byte {
+func (aes *AES) DecryptBlock(block []byte) []byte {
 	state := make([]byte, 16)
-	copy(state, input)
+	copy(state, block)
 
 	addRoundKey(state, aes.expandedKey[10])
 
@@ -60,4 +60,32 @@ func (aes *AES) DecryptBlock(input []byte) []byte {
 	addRoundKey(state, aes.expandedKey[0])
 
 	return state
+}
+
+func (aes *AES) Decrypt(ciphertext []byte) ([]byte, error) {
+	// Calcula o número de blocos
+	numBlocks := len(ciphertext) / blockSize
+	plaintext := make([]byte, numBlocks*blockSize)
+
+	for i := 0; i < numBlocks; i++ {
+		// Cria um bloco de 16 bytes
+		block := make([]byte, blockSize)
+
+		// Copia o bloco do ciphertext
+		copy(block, ciphertext[i*blockSize:(i+1)*blockSize])
+
+		// Decifra o bloco
+		decryptedBlock := aes.DecryptBlock(block)
+
+		// Copia o bloco decifrado para o plaintext
+		copy(plaintext[i*blockSize:], decryptedBlock)
+	}
+
+	// Remove o padding (ex: PKCS#7)
+	paddingLen := int(plaintext[len(plaintext)-1])
+	if paddingLen > 0 && paddingLen <= blockSize {
+		plaintext = plaintext[:len(plaintext)-paddingLen]
+	}
+
+	return plaintext, nil
 }

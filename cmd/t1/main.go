@@ -1,22 +1,46 @@
 package main
 
 import (
+	"bufio"
+	"encoding/hex"
+	"flag"
 	"fmt"
+	"log"
+	"os"
+	"strings"
 
 	"github.com/yagoyudi/criptografia-t1/internal/aes128"
 )
 
 func main() {
-	key := []byte{
-		0x2b, 0x7e, 0x15, 0x16,
-		0x28, 0xae, 0xd2, 0xa6,
-		0xab, 0xf7, 0x97, 0x75,
-		0x45, 0x21, 0x48, 0x8d,
+	var keyString string
+	flag.StringVar(&keyString, "key", "", "Hexadecimal key (16 bytes)")
+	flag.Parse()
+
+	key, err := hex.DecodeString(strings.ReplaceAll(keyString, " ", ""))
+	if err != nil || len(key) != 16 {
+		log.Fatal("Key must be 16 bytes in hexadecimal format.")
 	}
+
 	aes := aes128.NewAES(key)
-	plaintext := []byte("This is a test")
-	ciphertext := aes.EncryptBlock(plaintext)
+
+	reader := bufio.NewReader(os.Stdin)
+	fmt.Print("Enter plaintext: ")
+	plaintext, err := reader.ReadString('\n')
+	if err != nil {
+		log.Fatal(err)
+	}
+	plaintext = strings.TrimSpace(plaintext)
+
+	ciphertext, err := aes.Encrypt([]byte(plaintext))
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("Ciphertext: %x\n", ciphertext)
-	decrypted := aes.DecryptBlock(ciphertext)
+
+	decrypted, err := aes.Decrypt(ciphertext)
+	if err != nil {
+		log.Fatal(err)
+	}
 	fmt.Printf("Decrypted: %s\n", decrypted)
 }
