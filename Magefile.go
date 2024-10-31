@@ -1,0 +1,29 @@
+//go:build mage
+
+package main
+
+import "github.com/magefile/mage/sh"
+
+func Build() error {
+	err := sh.RunV("go", "build", "-o", "bin/t1", "./cmd/t1")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func Test() error {
+	err := sh.RunV("go", "test", "./...")
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func Clean() error {
+	err := sh.RunV("rm", "-rf", "bin")
+	if err != nil {
+		return err
+	}
+	return nil
+}
