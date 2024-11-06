@@ -1,6 +1,7 @@
 package cmd
 
 import (
+	"encoding/base64"
 	"fmt"
 	"log"
 
@@ -33,6 +34,6 @@ var encryptCmd = &cobra.Command{
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%x\n", ciphertext)
+		fmt.Printf("%s\n", base64.StdEncoding.EncodeToString(ciphertext))
 	},
 }

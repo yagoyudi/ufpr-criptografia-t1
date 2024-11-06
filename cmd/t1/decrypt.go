@@ -29,10 +29,10 @@ var decryptCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		plaintext, err := aes.Decrypt([]byte(ciphertext))
+		plaintext, err := aes.Decrypt(ciphertext)
 		if err != nil {
 			log.Fatal(err)
 		}
-		fmt.Printf("%x\n", plaintext)
+		fmt.Printf("%s\n", string(plaintext))
 	},
 }

@@ -2,14 +2,18 @@ package cmd
 
 import (
 	"bufio"
-	"encoding/hex"
+	"encoding/base64"
 	"fmt"
 	"os"
 	"strings"
 )
 
 func decodeKey(key string) ([]byte, error) {
-	decoded, err := hex.DecodeString(strings.ReplaceAll(key, " ", ""))
+	content, err := os.ReadFile(key)
+	if err != nil {
+		return nil, err
+	}
+	decoded, err := base64.StdEncoding.DecodeString(string(content))
 	if err != nil {
 		return nil, err
 	}
@@ -29,12 +33,16 @@ func readPlaintextFromStdin() (string, error) {
 	return plaintext, nil
 }
 
-func readCiphertextFromStdin() (string, error) {
+func readCiphertextFromStdin() ([]byte, error) {
 	reader := bufio.NewReader(os.Stdin)
 	ciphertext, err := reader.ReadString('\n')
 	if err != nil {
-		return "", err
+		return nil, err
 	}
 	ciphertext = strings.TrimSpace(ciphertext)
-	return ciphertext, nil
+	decoded, err := base64.StdEncoding.DecodeString(ciphertext)
+	if err != nil {
+		return nil, err
+	}
+	return decoded, nil
 }
