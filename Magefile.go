@@ -13,7 +13,7 @@ func Build() error {
 }
 
 func Test() error {
-	err := sh.RunV("go", "test", "./...")
+	err := sh.RunV("go", "test", "-v", "./...")
 	if err != nil {
 		return err
 	}
