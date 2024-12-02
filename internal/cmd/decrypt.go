@@ -5,34 +5,54 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
-	"github.com/yagoyudi/criptografia-t1/internal/aes128"
+	"github.com/yagoyudi/criptografia-t1/internal/myaes"
+	"github.com/yagoyudi/criptografia-t1/internal/stdlib"
 )
 
 func init() {
 	rootCmd.AddCommand(decryptCmd)
+	decryptCmd.Flags().BoolP("stdlib", "s", false, "Use Go's standard library AES instead of custom implementation")
 }
 
 var decryptCmd = &cobra.Command{
-	Use:   "decrypt [key]",
+	Use:   "dec [key file path] [ciphertext file path]",
 	Short: "Decrypt ciphertext",
 	Long:  "Decrypt ciphertext",
-	Args:  cobra.ExactArgs(1),
+	Args:  cobra.ExactArgs(2),
 	Run: func(cmd *cobra.Command, args []string) {
+		useStdlib, err := cmd.Flags().GetBool("stdlib")
+		if err != nil {
+			log.Fatal(err)
+		}
+
 		key, err := decodeKey(args[0])
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		aes := aes128.NewAES(key)
-		ciphertext, err := readCiphertextFromStdin()
+		var initialKey [16]byte
+		copy(initialKey[:], key)
+
+		ciphertext, err := readCiphertext(args[1])
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		plaintext, err := aes.Decrypt(ciphertext)
-		if err != nil {
-			log.Fatal(err)
+		aes := myaes.NewAES(initialKey)
+
+		var plaintext []byte
+		if useStdlib {
+			plaintext, err = stdlib.DecryptMessage(key, ciphertext)
+			if err != nil {
+				log.Fatal(err)
+			}
+		} else {
+			plaintext, err = aes.Decrypt(ciphertext)
+			if err != nil {
+				log.Fatal(err)
+			}
 		}
-		fmt.Printf("%s\n", string(plaintext))
+
+		fmt.Println(string(plaintext))
 	},
 }

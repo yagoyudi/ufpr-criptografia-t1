@@ -1,4 +1,4 @@
-package aes128
+package myaes
 
 func mul0x0e(x byte) byte {
 	return xtime(xtime(xtime(x)^x) ^ x)

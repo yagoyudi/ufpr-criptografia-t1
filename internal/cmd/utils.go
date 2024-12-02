@@ -1,7 +1,6 @@
 package cmd
 
 import (
-	"bufio"
 	"encoding/base64"
 	"fmt"
 	"os"
@@ -23,24 +22,13 @@ func decodeKey(key string) ([]byte, error) {
 	return decoded, nil
 }
 
-func readPlaintextFromStdin() (string, error) {
-	reader := bufio.NewReader(os.Stdin)
-	plaintext, err := reader.ReadString('\n')
-	if err != nil {
-		return "", err
-	}
-	plaintext = strings.TrimSpace(plaintext)
-	return plaintext, nil
-}
-
-func readCiphertextFromStdin() ([]byte, error) {
-	reader := bufio.NewReader(os.Stdin)
-	ciphertext, err := reader.ReadString('\n')
+func readCiphertext(path string) ([]byte, error) {
+	ciphertext, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
-	ciphertext = strings.TrimSpace(ciphertext)
-	decoded, err := base64.StdEncoding.DecodeString(ciphertext)
+	ciphertextStr := strings.TrimSpace(string(ciphertext))
+	decoded, err := base64.StdEncoding.DecodeString(ciphertextStr)
 	if err != nil {
 		return nil, err
 	}
