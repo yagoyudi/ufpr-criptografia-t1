@@ -2,7 +2,10 @@
 
 package main
 
-import "github.com/magefile/mage/sh"
+import (
+	"github.com/carolynvs/magex/pkg"
+	"github.com/magefile/mage/sh"
+)
 
 var Default = Build
 
@@ -28,4 +31,8 @@ func Clean() error {
 		return err
 	}
 	return nil
+}
+
+func EnsureMage() error {
+	return pkg.EnsureMage("")
 }
