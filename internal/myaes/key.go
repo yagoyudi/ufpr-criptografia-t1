@@ -5,16 +5,15 @@ const (
 	numberOfRounds = 10
 )
 
-type Key struct {
-	// numberOfRounds + 1, para que round[0] seja a chave inicial.
-	round [numberOfRounds + 1][keySize]byte
-}
+func expandKey(initialKey []byte) [][]byte {
+	roundKeys := make([][]byte, numberOfRounds+1)
+	for i := range roundKeys {
+		roundKeys[i] = make([]byte, keySize)
+	}
 
-func (k *Key) expand(initialKey [keySize]byte) {
-	copy(k.round[0][:], initialKey[:])
+	copy(roundKeys[0], initialKey)
 	for i := 1; i <= numberOfRounds; i++ {
-		// últimos 4 bytes da rodada anterior
-		tmp := k.round[i-1][12:16]
+		tmp := roundKeys[i-1][12:16]
 
 		// RotWord, SubWord e XOR com rcon
 		tmp = append(tmp[1:], tmp[0]) // RotWord
@@ -27,13 +26,13 @@ func (k *Key) expand(initialKey [keySize]byte) {
 
 		tmp[0] ^= rcon[i-1]
 
-		// Gera os 16 bytes da chave de rodada
-		for j := 0; j < 16; j++ {
+		for j := 0; j < keySize; j++ {
 			if j < 4 {
-				k.round[i][j] = k.round[i-1][j] ^ tmp[j]
+				roundKeys[i][j] = roundKeys[i-1][j] ^ tmp[j]
 			} else {
-				k.round[i][j] = k.round[i-1][j] ^ k.round[i][j-4]
+				roundKeys[i][j] = roundKeys[i-1][j] ^ roundKeys[i][j-4]
 			}
 		}
 	}
+	return roundKeys
 }

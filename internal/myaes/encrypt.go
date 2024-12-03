@@ -1,10 +1,14 @@
 package myaes
 
-import "sync"
+import (
+	"sync"
+)
 
-func (aes *AES) Encrypt(plaintext []byte) ([]byte, error) {
+func (aes *AES) Encrypt(initialKey []byte, plaintext []byte) ([]byte, error) {
 	numBlocks := (len(plaintext) + blockSize - 1) / blockSize
 	ciphertext := make([]byte, numBlocks*blockSize)
+
+	roundKey := expandKey(initialKey)
 
 	var wg sync.WaitGroup
 	blockChan := make(chan struct {
@@ -18,7 +22,7 @@ func (aes *AES) Encrypt(plaintext []byte) ([]byte, error) {
 			defer wg.Done()
 			block := getNextBlock(i, plaintext)
 			b := Block{state: block}
-			b.encrypt(aes.key)
+			b.encrypt(roundKey)
 			blockChan <- struct {
 				index int
 				block [blockSize]byte

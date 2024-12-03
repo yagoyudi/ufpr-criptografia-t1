@@ -11,6 +11,10 @@ import (
 	"github.com/yagoyudi/criptografia-t1/internal/stdlib"
 )
 
+type Encripter interface {
+	Encrypt([]byte, []byte) ([]byte, error)
+}
+
 func init() {
 	rootCmd.AddCommand(encryptCmd)
 	encryptCmd.Flags().BoolP("stdlib", "s", false, "Use Go's standard library AES instead of custom implementation")
@@ -32,27 +36,20 @@ var encryptCmd = &cobra.Command{
 			log.Fatal(err)
 		}
 
-		var initialKey [16]byte
-		copy(initialKey[:], key)
-
 		plaintext, err := os.ReadFile(args[1])
 		if err != nil {
 			log.Fatal(err)
 		}
 
-		aes := myaes.NewAES(initialKey)
-
-		var ciphertext []byte
+		var encripter Encripter
 		if useStdlib {
-			ciphertext, err = stdlib.EncryptMessage(key, plaintext)
-			if err != nil {
-				log.Fatal(err)
-			}
+			encripter = &stdlib.AES{}
 		} else {
-			ciphertext, err = aes.Encrypt(plaintext)
-			if err != nil {
-				log.Fatal(err)
-			}
+			encripter = &myaes.AES{}
+		}
+		ciphertext, err := encripter.Encrypt(key, plaintext)
+		if err != nil {
+			log.Fatal(err)
 		}
 
 		fmt.Printf("%s\n", base64.StdEncoding.EncodeToString(ciphertext))

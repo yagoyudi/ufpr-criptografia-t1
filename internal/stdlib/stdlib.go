@@ -8,7 +8,10 @@ import (
 	"io"
 )
 
-func EncryptMessage(key []byte, plaintext []byte) ([]byte, error) {
+type AES struct {
+}
+
+func (a *AES) Encrypt(key []byte, plaintext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, fmt.Errorf("could not create new cipher: %v", err)
@@ -26,7 +29,7 @@ func EncryptMessage(key []byte, plaintext []byte) ([]byte, error) {
 	return ciphertext, nil
 }
 
-func DecryptMessage(key []byte, ciphertext []byte) ([]byte, error) {
+func (a *AES) Decrypt(key []byte, ciphertext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
 		return nil, fmt.Errorf("could not create new cipher: %v", err)

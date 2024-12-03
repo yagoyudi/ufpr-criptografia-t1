@@ -8,34 +8,34 @@ type Block struct {
 	state [blockSize]byte
 }
 
-func (b *Block) encrypt(key *Key) {
-	b.addRoundKey(key.round[0])
+func (b *Block) encrypt(roundKey [][]byte) {
+	b.addRoundKey(roundKey[0])
 
 	for i := 1; i < 10; i++ {
 		b.subBytes()
 		b.shiftRows()
 		b.mixColumns()
-		b.addRoundKey(key.round[i])
+		b.addRoundKey(roundKey[i])
 	}
 
 	b.subBytes()
 	b.shiftRows()
-	b.addRoundKey(key.round[10])
+	b.addRoundKey(roundKey[10])
 }
 
-func (b *Block) decrypt(key *Key) {
-	b.addRoundKey(key.round[10])
+func (b *Block) decrypt(roundKey [][]byte) {
+	b.addRoundKey(roundKey[10])
 
 	for i := 9; i > 0; i-- {
 		b.invShiftRows()
 		b.invSubBytes()
-		b.addRoundKey(key.round[i])
+		b.addRoundKey(roundKey[i])
 		b.invMixColumns()
 	}
 
 	b.invShiftRows()
 	b.invSubBytes()
-	b.addRoundKey(key.round[0])
+	b.addRoundKey(roundKey[0])
 }
 
 func (b *Block) subBytes() {
@@ -65,7 +65,7 @@ func (b *Block) mixColumns() {
 	}
 }
 
-func (b *Block) addRoundKey(key [keySize]byte) {
+func (b *Block) addRoundKey(key []byte) {
 	for i := 0; i < len(b.state); i++ {
 		b.state[i] ^= key[i]
 	}

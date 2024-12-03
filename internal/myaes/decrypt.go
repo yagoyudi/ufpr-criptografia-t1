@@ -2,9 +2,11 @@ package myaes
 
 import "sync"
 
-func (aes *AES) Decrypt(ciphertext []byte) ([]byte, error) {
+func (aes *AES) Decrypt(initialKey []byte, ciphertext []byte) ([]byte, error) {
 	numBlocks := len(ciphertext) / blockSize
 	plaintext := make([]byte, len(ciphertext))
+
+	roundKey := expandKey(initialKey)
 
 	decryptedBlocks := make(chan struct {
 		index int
@@ -21,7 +23,7 @@ func (aes *AES) Decrypt(ciphertext []byte) ([]byte, error) {
 			var b Block
 			copy(b.state[:], ciphertext[blockIndex*blockSize:(blockIndex+1)*blockSize])
 
-			b.decrypt(aes.key)
+			b.decrypt(roundKey)
 
 			decryptedBlocks <- struct {
 				index int
