@@ -8,6 +8,8 @@ func (aes *AES) Decrypt(initialKey []byte, ciphertext []byte) ([]byte, error) {
 
 	roundKey := expandKey(initialKey)
 
+	initSbox()
+
 	decryptedBlocks := make(chan struct {
 		index int
 		block Block

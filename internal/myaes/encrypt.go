@@ -10,6 +10,8 @@ func (aes *AES) Encrypt(initialKey []byte, plaintext []byte) ([]byte, error) {
 
 	roundKey := expandKey(initialKey)
 
+	initSbox()
+
 	var wg sync.WaitGroup
 	blockChan := make(chan struct {
 		index int
