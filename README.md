@@ -47,3 +47,13 @@ Para detalhes sobre como usar o programa, execute:
     Descriptografa o texto criptografado `enc` usando a chave `example/key` e a
     implementação do AES da biblioteca padrão do Go.
 
+## Detalhes da minha implementação do AES
+
+-   Troquei a caixa S por uma caixa pseudo-aleatória.
+    
+    - [sbox](./internal/myaes/sbox.go)
+
+-   Fiz a criptografia/descriptografia dos blocos em paralelo.
+
+    - [encrypt](./internal/myaes/encrypt.go)
+    - [decrypt](./internal/myaes/decrypt.go)
