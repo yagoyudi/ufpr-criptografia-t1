@@ -141,5 +141,9 @@ e em uma máquina com:
 
 ## Conclusão
 
-A biblioteca padrão do Go é mais rápida em praticamente todos os casos.
+A biblioteca padrão do Go é mais rápida em praticamente todos os casos. Esse
+resultado já era esperado, porque a implementação padrão usa uma caixa-s
+constante e várias "tables-lookup" para pré-calcular algumas rodadas do AES.
+Enquanto isso, a minha implementação é totalmente feita do zero, não usa essas
+tables-lookup's e tem que calcular a caixa-s toda vez.
 
