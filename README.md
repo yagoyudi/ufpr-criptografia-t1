@@ -114,25 +114,32 @@ juntas. Dessa forma, não faz sentido comparar o custo de cada etapa do
 algoritmo. Portanto, foi comparado apenas o tempo total da
 criptografia/descriptografia do mesmo arquivo.
 
+Os testes foram realizados com:
+-   image.jps (26K)
+-   tgpl.pdf (5,1M)
+
+e em uma máquina com:
+-   CPU: 11th Gen Intel i5-1135G7 (8) @ 4.200GHz 
+-   GPU: Intel TigerLake-LP GT2 [Iris Xe Graphics] 
+-   Memory: 7740MiB 
+
 ### Criptografia
 
-| **Tamanho do Arquivo** | **Minha Implementação (ms)** | **Implementação Padrão (ms)** |
-|------------------------|-----------------------------|------------------------------|
-| 1 KB                   | 10                          | 15                           |
-| 10 KB                  | 35                          | 50                           |
-| 100 KB                 | 200                         | 250                          |
-| 1 MB                   | 950                         | 1200                         |
-| 10 MB                  | 9000                        | 11500                        |
-| 100 MB                 | 85000                       | 105000                       |
+
+| **Nome**  | **Minha Implementação** | **Implementação Padrão** |
+|-----------|-------------------------|--------------------------| 
+| image.jpg | 0,007s | 0,005s |
+| tgpl.pdf  | 0,151s | 0,031s |
 
 ### Descriptografia
 
-| **Tamanho do Arquivo** | **Minha Implementação (ms)** | **Implementação Padrão (ms)** |
-|------------------------|-----------------------------|------------------------------|
-| 1 KB                   | 10                          | 15                           |
-| 10 KB                  | 35                          | 50                           |
-| 100 KB                 | 200                         | 250                          |
-| 1 MB                   | 950                         | 1200                         |
-| 10 MB                  | 9000                        | 11500                        |
-| 100 MB                 | 85000                       | 105000                       |
+| **Nome**  | **Minha Implementação** | **Implementação Padrão** |
+|-----------|-------------------------|--------------------------|
+| image.jpg | 0,012s | 0,005s |
+| tgpl.pdf  | 0,417s | 0,029s |
+
+
+## Conclusão
+
+A biblioteca padrão do Go é mais rápida em praticamente todos os casos.
 
