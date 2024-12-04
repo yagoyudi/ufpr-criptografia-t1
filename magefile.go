@@ -3,6 +3,7 @@
 package main
 
 import (
+	"fmt"
 	"os"
 	"os/exec"
 
@@ -28,7 +29,7 @@ func EnsureMage() error {
 	return pkg.EnsureMage("")
 }
 
-func BashCompletion() error {
+func bashCompletion() error {
 	Build()
 
 	output, err := sh.Output("./bin/t1", "completion", "bash")
@@ -51,4 +52,13 @@ func BashCompletion() error {
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
 	return cmd.Run()
+}
+
+func Completion(shell string) error {
+	switch shell {
+	case "bash":
+		return bashCompletion()
+	default:
+		return fmt.Errorf("invalid shell (valid: bash)")
+	}
 }
