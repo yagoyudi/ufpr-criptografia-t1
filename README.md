@@ -49,7 +49,7 @@ Para detalhes sobre como usar o programa, execute:
 
 ## Detalhes da minha implementação do AES
 
--   Troquei a caixa S por uma caixa pseudo-aleatória.
+-   Troquei a caixa S por uma caixa pseudo-aleatória (usa a mesma seed).
     
     - [sbox](./internal/myaes/sbox.go)
 
@@ -126,15 +126,15 @@ e em uma máquina com:
 ### Criptografia
 
 
-| **Nome**  | **Minha Implementação** | **Implementação Padrão** |
-|-----------|-------------------------|--------------------------| 
+| **Arquivo**  | **Minha Implementação** | **Implementação da Biblioteca Padrão** |
+|-----------|--------|--------| 
 | image.jpg | 0,007s | 0,005s |
 | tgpl.pdf  | 0,151s | 0,031s |
 
 ### Descriptografia
 
-| **Nome**  | **Minha Implementação** | **Implementação Padrão** |
-|-----------|-------------------------|--------------------------|
+| **Arquivo**  | **Minha Implementação** | **Implementação da Biblioteca Padrão** |
+|-----------|--------|--------|
 | image.jpg | 0,012s | 0,005s |
 | tgpl.pdf  | 0,417s | 0,029s |
 
