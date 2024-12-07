@@ -49,14 +49,13 @@ Para detalhes sobre como usar o programa, execute:
 
 ## Detalhes da minha implementação do AES
 
--   Troquei a caixa S por uma caixa pseudo-aleatória (usa a mesma seed).
-    
-    - [sbox](./internal/myaes/sbox.go)
+-   Troquei a caixa S por uma cifra de substituição simples (monográfica).
+
+    [sbox](./internal/myaes/sbox.go)
 
 -   Fiz a criptografia/descriptografia dos blocos em paralelo.
 
-    - [encrypt](./internal/myaes/encrypt.go)
-    - [decrypt](./internal/myaes/decrypt.go)
+    [myaes](./internal/myaes/myaes.go)
 
 ## Benchmark
 
@@ -135,15 +134,15 @@ e em uma máquina com:
 
 | **Arquivo**  | **Minha Implementação** | **Implementação da Biblioteca Padrão** |
 |-----------|--------|--------|
-| image.jpg | 0,012s | 0,005s |
-| tgpl.pdf  | 0,417s | 0,029s |
+| image.jpg | 0,011s | 0,005s |
+| tgpl.pdf  | 0,417s | 0,036s |
 
 
 ## Conclusão
 
 A biblioteca padrão do Go é mais rápida em praticamente todos os casos. Esse
 resultado já era esperado, porque a implementação padrão usa uma caixa-s
-constante e várias "tables-lookup" para pré-calcular algumas rodadas do AES.
-Enquanto isso, a minha implementação é totalmente feita do zero, não usa essas
-tables-lookup's e tem que calcular a caixa-s toda vez.
-
+constante e várias "tables-lookup" para pré-calcular algumas rodadas do AES
+além de usar uma implementação de Assembly quando suportado.  Enquanto isso, a
+minha implementação é totalmente feita do zero em Go somente, não usa essas
+tables-lookup's e tem que calcular a caixa s toda vez.

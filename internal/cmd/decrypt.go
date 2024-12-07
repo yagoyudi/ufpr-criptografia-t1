@@ -5,8 +5,8 @@ import (
 	"log"
 
 	"github.com/spf13/cobra"
-	"github.com/yagoyudi/criptografia-t1/internal/myaes"
-	"github.com/yagoyudi/criptografia-t1/internal/stdlib"
+	"github.com/yagoyudi/ufpr-criptografia-t1/internal/myaes"
+	"github.com/yagoyudi/ufpr-criptografia-t1/internal/stdlib"
 )
 
 type Decripter interface {

@@ -5,45 +5,61 @@ import (
 	"crypto/cipher"
 	"crypto/rand"
 	"fmt"
-	"io"
+
+	"github.com/yagoyudi/ufpr-criptografia-t1/internal/padding"
 )
 
 type AES struct {
 }
 
-func (a *AES) Encrypt(key []byte, plaintext []byte) ([]byte, error) {
+func (a *AES) Encrypt(key, plaintext []byte) ([]byte, error) {
 	block, err := aes.NewCipher(key)
 	if err != nil {
-		return nil, fmt.Errorf("could not create new cipher: %v", err)
+		return nil, fmt.Errorf("failed to create AES cipher: %w", err)
 	}
 
-	ciphertext := make([]byte, aes.BlockSize+len(plaintext))
-	iv := ciphertext[:aes.BlockSize]
-	if _, err = io.ReadFull(rand.Reader, iv); err != nil {
-		return nil, fmt.Errorf("could not encrypt: %v", err)
+	iv := make([]byte, aes.BlockSize)
+	_, err = rand.Read(iv)
+	if err != nil {
+		return nil, fmt.Errorf("failed to generate IV: %w", err)
 	}
 
-	stream := cipher.NewCFBEncrypter(block, iv)
-	stream.XORKeyStream(ciphertext[aes.BlockSize:], plaintext)
+	cbc := cipher.NewCBCEncrypter(block, iv)
+	plaintext = padding.Pad(plaintext, aes.BlockSize)
+	ciphertext := make([]byte, len(plaintext)+aes.BlockSize)
+
+	// Inclui o IV no início do ciphertext
+	copy(ciphertext[:aes.BlockSize], iv)
+	cbc.CryptBlocks(ciphertext[aes.BlockSize:], plaintext)
 
 	return ciphertext, nil
 }
 
-func (a *AES) Decrypt(key []byte, ciphertext []byte) ([]byte, error) {
-	block, err := aes.NewCipher(key)
-	if err != nil {
-		return nil, fmt.Errorf("could not create new cipher: %v", err)
+func (a *AES) Decrypt(key, ciphertext []byte) ([]byte, error) {
+	if len(ciphertext) < aes.BlockSize {
+		return nil, fmt.Errorf("ciphertext too short")
 	}
 
-	if len(ciphertext) < aes.BlockSize {
-		return nil, fmt.Errorf("invalid ciphertext block size")
+	block, err := aes.NewCipher(key)
+	if err != nil {
+		return nil, err
 	}
 
 	iv := ciphertext[:aes.BlockSize]
-	ciphertext = ciphertext[aes.BlockSize:]
+	ciphertext = ciphertext[aes.BlockSize:] // Remove o IV
 
-	stream := cipher.NewCFBDecrypter(block, iv)
-	stream.XORKeyStream(ciphertext, ciphertext)
+	if len(ciphertext)%aes.BlockSize != 0 {
+		return nil, fmt.Errorf("ciphertext is not a multiple of the block size")
+	}
 
-	return ciphertext, nil
+	plaintext := make([]byte, len(ciphertext))
+	cbc := cipher.NewCBCDecrypter(block, iv)
+	cbc.CryptBlocks(plaintext, ciphertext)
+
+	plaintext, err = padding.Unpad(plaintext, aes.BlockSize)
+	if err != nil {
+		return nil, err
+	}
+
+	return plaintext, nil
 }
